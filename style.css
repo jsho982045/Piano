@@ -12,11 +12,11 @@ body {
     align-items: start;
     border: 1px solid #000;
     border-radius: 5px;
-    background-color: #fff;
+    background-color: #f70c0c;
     padding: 10px;
     position: relative;
     height: 200px;
-    width: 1000px; /* Width adjusted to fit all keys */
+    width: 955px; /* Width adjusted to fit all keys */
 }
 
 .key {

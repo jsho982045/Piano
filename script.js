@@ -1,3 +1,5 @@
+let sustainPedalActive = false;
+
 function setup() {
     let audioContext = new AudioContext();
     let oscList = [];
@@ -7,22 +9,33 @@ function setup() {
 
     function playTone(freqValue) {
         let osc = audioContext.createOscillator();
-        osc.connect(mainGainNode);
+        let gainNode = audioContext.createGain();
+        gainNode.connect(audioContext.destination);
+        osc.connect(gainNode);
         osc.type = 'sine';
         osc.frequency.value = freqValue;
         osc.start();
-        return osc;
+        return {osc, gainNode};
     }
 
     function notePressed(event, freq) {
         event.target.style.backgroundColor = 'lightgray';
         oscList[event.target.id] = playTone(freq);
+        if (!sustainPedalActive) {
+            oscList[event.target.id].gainNode.gain.setValueAtTime(0.8, audioContext.currentTime);
+            oscList[event.target.id].gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1);
+            oscList[event.target.id].osc.stop(audioContext.currentTime + 1);
+        }
     }
 
     function noteReleased(event) {
-        event.target.style.backgroundColor = '';
-        oscList[event.target.id].stop();
-        oscList[event.target.id] = undefined;
+        if (!sustainPedalActive) {
+            event.target.style.backgroundColor = '';
+            if(oscList[event.target.id]) {
+                oscList[event.target.id].osc.stop();
+                oscList[event.target.id] = undefined;
+            }
+        }
     }
 
     let keyMap = {
@@ -87,6 +100,64 @@ function setup() {
         });
     });
 
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Shift') {
+            sustainPedalActive = true;
+            showSustainIndicator();
+        }
+    });
+    document.addEventListener('keyup', function(event) {
+        if (event.key === 'Shift') {
+            sustainPedalActive = false;
+            hideSustainIndicator();
+            releaseSustainedNotes();
+        }
+    });
+
+    function releaseSustainedNotes() {
+        for (let key in oscList) {
+            if (oscList[key]) {
+                let pianoKeyElement = document.getElementById(key);
+                if (pianoKeyElement) {
+                    pianoKeyElement.style.backgroundColor = ''; // Reset the background color
+                }
+                oscList[key].osc.stop();
+                oscList[key] = undefined;
+            }
+        }
+    }
+
+    function showSustainIndicator() {
+        // Create or select a popup element and make it visible
+        // Example code assumes an element with id 'sustain-popup' exists
+        let sustainPopup = document.getElementById('sustain-popup');
+        if (!sustainPopup) {
+            sustainPopup = document.createElement('div');
+            sustainPopup.id = 'sustain-popup';
+            sustainPopup.textContent = 'Sustain On';
+            sustainPopup.style.position = 'fixed';
+            sustainPopup.style.bottom = '10px';
+            sustainPopup.style.left = '50%';
+            sustainPopup.style.transform = 'translateX(-50%)';
+            sustainPopup.style.padding = '5px 10px';
+            sustainPopup.style.backgroundColor = 'black';
+            sustainPopup.style.color = 'white';
+            sustainPopup.style.borderRadius = '5px';
+            sustainPopup.style.zIndex = '1000';
+            document.body.appendChild(sustainPopup);
+        }
+        sustainPopup.style.display = 'block';
+    }
+
+    // Hide sustain indicator
+    function hideSustainIndicator() {
+        let sustainPopup = document.getElementById('sustain-popup');
+        if (sustainPopup) {
+            sustainPopup.style.display = 'none';
+        }
+    }
+
+
     // Adjust black key positions
     function adjustBlackKeys() {
         // Define the left offsets for each black key manually
@@ -107,5 +178,6 @@ function setup() {
 
     adjustBlackKeys(); 
     addLabelsToKeys();
+
 }
 window.onload = setup;
