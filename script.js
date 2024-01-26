@@ -17,7 +17,7 @@ function setup() {
         let gainNode = audioContext.createGain();
         gainNode.connect(masterGainNode);
         osc.connect(gainNode);
-        osc.type = 'triangle';
+        osc.type = 'sine';
         osc.frequency.value = freqValue;
         osc.start();
         return {osc, gainNode};
@@ -25,23 +25,40 @@ function setup() {
 
     function notePressed(event, freq) {
         event.target.style.backgroundColor = 'lightgray';
-        oscList[event.target.id] = playTone(freq);
-        if (!sustainPedalActive) {
-            oscList[event.target.id].gainNode.gain.setValueAtTime(0.8, audioContext.currentTime);
-            oscList[event.target.id].gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1);
-            oscList[event.target.id].osc.stop(audioContext.currentTime + 1);
+    
+        // Check if there's an existing oscillator and if it has already been stopped
+        if (!oscList[event.target.id] || oscList[event.target.id].stopped) {
+            oscList[event.target.id] = playTone(freq);
         }
+    
+        // Schedule the note to stop after a certain time regardless of the sustain pedal
+        let stopTime = audioContext.currentTime + 1;
+        oscList[event.target.id].osc.stop(stopTime);
+        oscList[event.target.id].stopped = false; // Mark the oscillator as not stopped
     }
+    
 
     function noteReleased(event) {
-        if (!sustainPedalActive) {
-            event.target.style.backgroundColor = '';
-            if(oscList[event.target.id]) {
-                oscList[event.target.id].osc.stop();
-                oscList[event.target.id] = undefined;
-            }
+        let noteId = event.target.id;
+        if (!sustainPedalActive && oscList[noteId]) {
+            stopNote(noteId);
+        }
+        event.target.style.backgroundColor = '';
+    }
+
+    function stopNote(noteId) {
+        if (oscList[noteId] && !oscList[noteId].stopped) {
+            oscList[noteId].osc.stop(audioContext.currentTime);
+            oscList[noteId].gainNode.gain.setValueAtTime(0.001, audioContext.currentTime);
+            oscList[noteId].stopped = true; // Mark the oscillator as stopped
+        }
+        let pianoKeyElement = document.getElementById(noteId);
+        if (pianoKeyElement) {
+            pianoKeyElement.style.backgroundColor = ''; // Reset the background color
         }
     }
+    
+    
 
     let keyMap = {
         'C' : 130.81, 'C#': 138.59, 'D': 146.83, 'D#': 155.56, 'E': 164.81, 'F': 174.61, 'F#': 185.00, 'G': 196.00, 'G#': 207.65, 'A': 220.00, 'A#': 233.08, 'B': 246.94,
@@ -106,7 +123,7 @@ function setup() {
     });
 
     document.addEventListener('keydown', function(event) {
-        if (event.key === 'Shift') {
+        if (event.key === 'Shift' && !sustainPedalActive) {
             sustainPedalActive = true;
             showSustainIndicator();
         }
@@ -123,17 +140,13 @@ function setup() {
         masterGainNode.gain.value = event.target.value;
     });
 
+    
     function releaseSustainedNotes() {
-        for (let key in oscList) {
-            if (oscList[key]) {
-                let pianoKeyElement = document.getElementById(key);
-                if (pianoKeyElement) {
-                    pianoKeyElement.style.backgroundColor = ''; // Reset the background color
-                }
-                oscList[key].osc.stop();
-                oscList[key] = undefined;
+        Object.keys(oscList).forEach(function(noteId) {
+            if (oscList[noteId]) {
+                stopNote(noteId);
             }
-        }
+        });
     }
 
     function showSustainIndicator() {
