@@ -1,8 +1,13 @@
 let sustainPedalActive = false;
+let masterGainNode;
 
 function setup() {
     let audioContext = new AudioContext();
     let oscList = [];
+    masterGainNode = audioContext.createGain();
+    masterGainNode.connect(audioContext.destination);
+
+    masterGainNode.gain.value = 0.5;
 
     let mainGainNode = audioContext.createGain();
     mainGainNode.connect(audioContext.destination);
@@ -10,9 +15,9 @@ function setup() {
     function playTone(freqValue) {
         let osc = audioContext.createOscillator();
         let gainNode = audioContext.createGain();
-        gainNode.connect(audioContext.destination);
+        gainNode.connect(masterGainNode);
         osc.connect(gainNode);
-        osc.type = 'sine';
+        osc.type = 'triangle';
         osc.frequency.value = freqValue;
         osc.start();
         return {osc, gainNode};
@@ -112,6 +117,10 @@ function setup() {
             hideSustainIndicator();
             releaseSustainedNotes();
         }
+    });
+
+    document.getElementById('volume').addEventListener('input', function(event) {
+        masterGainNode.gain.value = event.target.value;
     });
 
     function releaseSustainedNotes() {

@@ -59,3 +59,13 @@ body {
     position: absolute;
     z-index: 2;
 }
+
+#controls {
+    position: fixed;
+    left: 10px;
+    bottom: 10px;
+    background-color: #eee;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 100;
+}
