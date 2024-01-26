@@ -27,13 +27,29 @@ body {
     margin: 0 2px;
     cursor: pointer;
     position: relative;
+    overflow: hidden;
     z-index: 0;
 }
+
+.key-label {
+    position: absolute;
+    bottom: 5px;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    pointer-events: none;
+    }
 
 .white {
     background-color: #fff;
     width: 40px;
     z-index: 1;
+}
+
+.white .key-label {
+    color: #000;
 }
 
 .black {

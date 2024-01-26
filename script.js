@@ -31,6 +31,48 @@ function setup() {
         'C3': 523.25, 'C#3': 554.37, 'D3': 587.33, 'D#3': 622.25, 'E3': 659.25, 'F3': 698.46, 'F#3': 739.99, 'G3': 783.99, 'G#3': 830.61, 'A3': 880.00, 'A#3': 932.33, 'B3': 987.77,
     };
 
+    let keyBindings = {
+        'KeyQ': 'C', 'Digit2': 'C#', 'KeyW': 'D', 'Digit3': 'D#', 'KeyE': 'E', 'KeyR': 'F', 'Digit5': 'F#', 'KeyT': 'G', 'Digit6': 'G#', 'KeyY': 'A', 'Digit7': 'A#', 'KeyU': 'B',
+        'KeyI': 'C2', 'Digit9': 'C#2', 'KeyO': 'D2', 'Digit0': 'D#2', 'KeyP': 'E2', 'BracketLeft': 'F2', 'Equal': 'F#2', 'BracketRight': 'G2', 'Backslash': 'G#2', 'KeyA': 'A2', 'KeyS': 'A#2', 'KeyD': 'B2',
+        'KeyF': 'C3', 'KeyG': 'C#3', 'KeyH': 'D3', 'KeyJ': 'D#3', 'KeyK': 'E3', 'KeyL': 'F3', 'Semicolon': 'F#3', 'Quote': 'G3', 'Enter': 'G#3', 'KeyZ': 'A3', 'KeyX': 'A#3', 'KeyC': 'B3'
+    };
+
+    let visualKeyLabels = {
+        // ... same keys as keyBindings with the visual representation of keys ...
+        'KeyQ': 'Q', 'Digit2': '2', 'KeyW': 'W', 'Digit3': '3', 'KeyE': 'E', 'KeyR': 'R', 'Digit5': '5', 'KeyT': 'T', 'Digit6': '6', 'KeyY': 'Y', 'Digit7': '7', 'KeyU': 'U', 'KeyI' : 'I', 'Digit9': '9', 'KeyO': 'O', 'Digit0': '0', 'KeyP': 'P', 'BracketLeft': '[', 'Equal': '=', 'BracketRight': ']', 'Backslash': '\\', 'KeyA': 'A', 'KeyS': 'S', 'KeyD': 'D', 'KeyF': 'F', 'KeyG': 'G', 'KeyH': 'H', 'KeyJ': 'J', 'KeyK': 'K', 'KeyL': 'L', 'Semicolon': ';', 'Quote': '\'', 'Enter': 'Enter', 'KeyZ': 'Z', 'KeyX': 'X', 'KeyC': 'C',
+    };
+
+     // Function to add label to each key
+     function addLabelsToKeys() {
+        for (let key in visualKeyLabels) {
+            let pianoKey = document.getElementById(keyBindings[key]);
+            let label = document.createElement('div');
+            label.classList.add('key-label');
+            label.textContent = visualKeyLabels[key];
+            pianoKey.appendChild(label);
+        }
+    }
+
+    // Add keydown event to document to play notes
+    document.addEventListener('keydown', function(event) {
+        if(keyBindings[event.code]) {
+            let pianoKey = document.getElementById(keyBindings[event.code]);
+            if(!oscList[pianoKey.id]) {
+                pianoKey.dispatchEvent(new MouseEvent('mousedown'));
+            }
+        }
+    });
+
+    // Add keyup event to document to release notes
+    document.addEventListener('keyup', function(event) {
+        if(keyBindings[event.code]) {
+            let pianoKey = document.getElementById(keyBindings[event.code]);
+            if(oscList[pianoKey.id]) {
+                pianoKey.dispatchEvent(new MouseEvent('mouseup'));
+            }
+        }
+    });
+
     document.querySelectorAll('.key').forEach(function(key) {
         key.addEventListener('mousedown', function(event) {
             notePressed(event, keyMap[key.id]);
@@ -63,6 +105,7 @@ function setup() {
         });
     }
 
-    adjustBlackKeys(); // Call the function immediately to adjust the black keys
+    adjustBlackKeys(); 
+    addLabelsToKeys();
 }
 window.onload = setup;
