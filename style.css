@@ -16,13 +16,13 @@ body {
     padding: 10px;
     position: relative;
     height: 200px;
-    width: 700px; /* Adjusted to fit all keys */
+    width: 1000px; /* Width adjusted to fit all keys */
 }
 
 .key {
     display: inline-block;
     height: 200px;
-    width: 40px; /* Width increased for a better look */
+    width: 40px;
     border: 1px solid #000;
     margin: 0 2px;
     cursor: pointer;
@@ -32,6 +32,8 @@ body {
 
 .white {
     background-color: #fff;
+    width: 40px;
+    z-index: 1;
 }
 
 .black {
@@ -39,8 +41,5 @@ body {
     height: 120px;
     width: 30px;
     position: absolute;
-    top: 0;
-    left: 0;
-    margin-left: 42px; /* This will be adjusted with JavaScript */
-    z-index: 1;
+    z-index: 2;
 }
