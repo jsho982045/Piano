@@ -17,7 +17,7 @@ function setup() {
         let gainNode = audioContext.createGain();
         gainNode.connect(masterGainNode);
         osc.connect(gainNode);
-        osc.type = 'sine';
+        osc.type = 'triangle';
         osc.frequency.value = freqValue;
         osc.start();
         return {osc, gainNode};
@@ -73,7 +73,6 @@ function setup() {
     };
 
     let visualKeyLabels = {
-        // ... same keys as keyBindings with the visual representation of keys ...
         'KeyQ': 'Q', 'Digit2': '2', 'KeyW': 'W', 'Digit3': '3', 'KeyE': 'E', 'KeyR': 'R', 'Digit5': '5', 'KeyT': 'T', 'Digit6': '6', 'KeyY': 'Y', 'Digit7': '7', 'KeyU': 'U', 'KeyI' : 'I', 'Digit9': '9', 'KeyO': 'O', 'Digit0': '0', 'KeyP': 'P', 'BracketLeft': '[', 'Equal': '=', 'BracketRight': ']', 'Backslash': '\\', 'KeyA': 'A', 'KeyS': 'S', 'KeyD': 'D', 'KeyF': 'F', 'KeyG': 'G', 'KeyH': 'H', 'KeyJ': 'J', 'KeyK': 'K', 'KeyL': 'L', 'Semicolon': ';', 'Quote': '\'', 'Enter': 'Enter', 'KeyZ': 'Z', 'KeyX': 'X', 'KeyC': 'C',
     };
 
@@ -151,7 +150,6 @@ function setup() {
 
     function showSustainIndicator() {
         // Create or select a popup element and make it visible
-        // Example code assumes an element with id 'sustain-popup' exists
         let sustainPopup = document.getElementById('sustain-popup');
         if (!sustainPopup) {
             sustainPopup = document.createElement('div');

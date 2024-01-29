@@ -16,7 +16,7 @@ body {
     padding: 10px;
     position: relative;
     height: 200px;
-    width: 955px; /* Width adjusted to fit all keys */
+    width: 955px; 
 }
 
 .key {
